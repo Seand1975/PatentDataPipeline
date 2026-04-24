@@ -1,15 +1,14 @@
 # Patent Data Pipeline
 
-This project builds a data pipeline that extracts patent data from the USPTO API,
+This project builds a data pipeline that cleans tsv files from uspto,
 transforms it using pandas, and loads it into a PostgreSQL database.
 
 ## Features
-- Multi-page API extraction
-- Data normalization into 4 tables:
-  - patents
-  - inventors
-  - companies
-  - relationships
+
+- Data normalization into 2 tables:
+  - patents_org
+  - patents_priority
+ 
 - Modular ETL design
 
 ## Setup
@@ -21,7 +20,7 @@ transforms it using pandas, and loads it into a PostgreSQL database.
 3. Setup PostgreSQL:
    CREATE DATABASE patents_db;
 
-4. Run schema:
+4. Run schema do this in project directory:
    psql -d patents_db -f schema.sql
 
 5. Set environment variable:
