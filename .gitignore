@@ -14,6 +14,7 @@ venv/
 
 # Database files (if any local exports)
 *.db
+data/processed/file1_clean.csv
 
 # Python cache
 __pycache__/
