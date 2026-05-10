@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from sqlalchemy import text
+from sqlalchemy import create_engine, text
 from clean_data import clean_file1, clean_file2
 from database import get_engine
 
@@ -33,18 +33,28 @@ def process_files():
     return df1_clean, df2_clean
 
 
-# -----------------------------
-# STEP 2: LOAD INTO POSTGRES (SAFE UPSERT)
-# -----------------------------
+def get_engine():
+    return create_engine(
+        "postgresql+psycopg2://postgres:bottonse@localhost:5432/patents_db"
+    )
+
+
 def load_to_db(df1, df2):
     engine = get_engine()
 
     with engine.begin() as conn:
 
         # =========================
-        # TABLE 1: patents_priority
+        # FILE 1 INSERT
         # =========================
         for _, row in df1.iterrows():
+
+            # ✅ FIX: convert NaN / NaT → None
+            clean_row = {
+                k: (None if pd.isna(v) else v)
+                for k, v in row.to_dict().items()
+            }
+
             conn.execute(
                 text("""
                     INSERT INTO patents_priority (
@@ -71,13 +81,20 @@ def load_to_db(df1, df2):
                         filing_date = EXCLUDED.filing_date,
                         foreign_country_filed = EXCLUDED.foreign_country_filed;
                 """),
-                row.to_dict()
+                clean_row  # ✅ FIX: pass dict directly (NOT keyword arg)
             )
 
         # =========================
-        # TABLE 2: patents_orgs
+        # FILE 2 INSERT
         # =========================
         for _, row in df2.iterrows():
+
+            # ✅ SAME FIX HERE
+            clean_row = {
+                k: (None if pd.isna(v) else v)
+                for k, v in row.to_dict().items()
+            }
+
             conn.execute(
                 text("""
                     INSERT INTO patents_orgs (
@@ -104,7 +121,7 @@ def load_to_db(df1, df2):
                         level_two = EXCLUDED.level_two,
                         level_three = EXCLUDED.level_three;
                 """),
-                row.to_dict()
+                clean_row  # ✅ FIX
             )
 
     print("✅ Data loaded successfully into PostgreSQL")

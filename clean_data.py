@@ -37,7 +37,7 @@ def clean_file1(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop_duplicates()
     df = df.dropna(subset=["patent_id"])
 
-    return df.head(300)
+    return df
 
 
 # ---------------- FILE 2: ORGANIZATION DATA ----------------
@@ -63,4 +63,4 @@ def clean_file2(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop_duplicates()
     df = df.dropna(subset=["patent_id"])
 
-    return df.head(300)
+    return df
